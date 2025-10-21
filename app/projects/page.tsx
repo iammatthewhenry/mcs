@@ -38,23 +38,38 @@ export default async function ProjectsPage() {
         <p className="text-slate-300">No projects found (set NEXT_PUBLIC_PAYLOAD_URL later).</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map(p => (
-            <div key={p.id} className="rounded-xl border border-emerald-400/30 bg-white/5 overflow-hidden">
-              <div className="relative h-40 bg-slate-800">
-                {p.heroImage?.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={mediaURL((p.heroImage as any).url)} alt={p.title} className="w-full h-full object-cover"/>
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center text-slate-300">No image</div>
-                )}
+          {projects.map(p => {
+            const heroSrc =
+              typeof p.heroImage === "string"
+                ? p.heroImage
+                : p.heroImage && typeof (p.heroImage as any).url === "string"
+                ? mediaURL((p.heroImage as { url: string }).url)
+                : undefined
+
+            return (
+              <div key={p.id} className="rounded-xl border border-emerald-400/30 bg-white/5 overflow-hidden">
+                <div className="relative h-40 bg-slate-800">
+                  {heroSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={heroSrc} alt={p.title} className="w-full h-full object-cover"/>
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-slate-300">
+                      No image
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg text-emerald-400">{p.title}</h3>
+                  {p.description && <p className="text-slate-300 text-sm mt-2">{p.description}</p>}
+                  {p.slug && (
+                    <Link href={`/projects/${p.slug}`} className="inline-block mt-3 underline text-emerald-400">
+                      View
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-lg text-emerald-400">{p.title}</h3>
-                {p.description && <p className="text-slate-300 text-sm mt-2">{p.description}</p>}
-                {p.slug && <Link href={`/projects/${p.slug}`} className="inline-block mt-3 underline text-emerald-400">View</Link>}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </section>
